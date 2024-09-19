@@ -17,4 +17,5 @@ jobs:
       - run: npm run eslint -- --fix
       - run: npm run build
       - run: npm run test
+      - run: npx playwright install
       - run: 'npm run test:e2e'

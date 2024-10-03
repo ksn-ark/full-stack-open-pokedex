@@ -57,6 +57,11 @@ const App = () => {
           />
         }
       />
+      <Route
+        exact
+        path="/version"
+        element={<div style={{ backgroundColor: '#333333' }}>0.1</div>}
+      />
     </Routes>
   )
 }

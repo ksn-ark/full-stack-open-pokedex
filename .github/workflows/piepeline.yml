@@ -1,5 +1,9 @@
 name: Deployment pipeline
 
+env:
+  PUSH_CONDITION: ${{ github.event_name == 'push' }}
+  TAG_SKIP_CONDITION: ${{ contains(join(github.event.commits.*.message, ', '), '#skip') }}
+
 on:
   push:
     branches:
@@ -23,7 +27,7 @@ jobs:
       - run: npx playwright install --with-deps
       - run: 'npm run test:e2e'
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ env.PUSH_CONDITION == 'true' }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
   tag_release:
     needs: [simple_deployment_pipeline]
@@ -31,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Bump version and push tag
-        if: ${{ github.event_name == 'push' && contains(github.event.commits.*.message, '#skip') }}
+        if: ${{ env.PUSH_CONDITION == 'true' && env.TAG_SKIP_CONDITION == 'false' }}
         uses: anothrNick/github-tag-action@1.71.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
